@@ -1,15 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 
 const TransactionsListScreen = ({ transactions }) => {
-  useEffect(() => {
-    console.log("Transactions in TransactionsListScreen:", transactions);
-  }, [transactions]);
-  
-  if (!transactions.length) {
-    return <View><Text style={styles.emptyListMessage}>No transactions yet.</Text></View>;
-  }
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Transactions List</Text>
@@ -20,13 +12,24 @@ const TransactionsListScreen = ({ transactions }) => {
           <View style={styles.transactionItem}>
             <Text style={styles.transactionName}>{item.name}</Text>
             <Text style={styles.transactionAmount}>Amount: ${item.amount.toFixed(2)}</Text>
-            <Text style={styles.transactionDate}>Date: {item.date}</Text>
+            <View style={styles.transactionDateContainer}>
+              <Text style={styles.transactionDateLabel}>Date:</Text>
+              <Text style={styles.transactionDate}>{formatDate(item.date)}</Text>
+            </View>
           </View>
         )}
         keyExtractor={(item) => item.id}
       />
     </View>
   );
+};
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 const styles = StyleSheet.create({
@@ -39,47 +42,39 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#25a585',
-    textAlign: 'center',
   },
   list: {
-    paddingVertical: 10,
+    flex: 1,
   },
   transactionItem: {
-    padding: 15,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
+    flexDirection: 'column', 
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
   transactionName: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#333',
+    marginBottom: 5, 
   },
   transactionAmount: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#25a585',
+    fontSize: 14,
+    color: 'green',
     marginBottom: 5,
   },
-  transactionDate: {
-    fontSize: 14,
-    color: '#777',
+  transactionDateContainer: {
+    flexDirection: 'row', 
+    alignItems: 'center', 
   },
-  emptyListMessage: {
-    fontSize: 16,
-    color: '#777',
-    textAlign: 'center',
-    marginTop: 30,
+  transactionDateLabel: {
+    fontSize: 12,
+    color: 'gray',
+    marginRight: 5, 
+  },
+  transactionDate: {
+    fontSize: 12,
+    color: 'gray',
+    fontStyle: 'italic', 
   },
 });
 

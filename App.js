@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { registerRootComponent } from 'expo';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -6,9 +7,11 @@ import TransactionsListScreen from './src/screens/TransactionsListScreen';
 import TransactionDetailScreen from './src/screens/TransactionDetailScreen';
 import SummaryScreen from './src/screens/SummaryScreen';
 import AddTransactionFormScreen from './src/screens/AddTransactionFormScreen';
+import database from './firebaseConfig.js';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+
 
 const TransactionsStack = ({ transactions, onAddTransaction }) => {
   const TransactionsListScreenComponent = () => (
@@ -46,6 +49,8 @@ const App = () => {
     </NavigationContainer>
   );
 };
+
+registerRootComponent(App);
 
 export default App;
 

@@ -1,24 +1,45 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { database } from '../../firebaseConfig';
+import { ref, push, set } from 'firebase/database';
 
 const AddTransactionFormScreen = ({ onAddTransaction }) => {
   const [transactionName, setTransactionName] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState('');
+  const [error, setError] = useState(null);
 
-  const handleAddTransaction = () => {
-    const newTransaction = {
-      id: Math.random().toString(),
-      name: transactionName,
-      amount: parseFloat(amount),
-      date: date,
-    };
+  const handleAddTransaction = async () => {
+    try {
+      if (!transactionName || !amount || !date) {
+        setError('Please fill in all fields.');
+        return;
+      }
 
-    onAddTransaction(newTransaction);
+      const newTransactionRef = push(ref(database, 'transactions'));
+      await set(newTransactionRef, {
+        name: transactionName,
+        amount: parseFloat(amount),
+        date: date,
+      });
 
-    setTransactionName('');
-    setAmount('');
-    setDate('');
+      const newTransaction = {
+        id: newTransactionRef.key,
+        name: transactionName,
+        amount: parseFloat(amount),
+        date: date,
+      };
+
+      onAddTransaction(newTransaction);
+
+      setTransactionName('');
+      setAmount('');
+      setDate('');
+      setError(null);
+    } catch (error) {
+      console.error('Error adding transaction:', error);
+      setError('Error adding transaction. Please try again.');
+    }
   };
 
   return (
@@ -53,6 +74,7 @@ const AddTransactionFormScreen = ({ onAddTransaction }) => {
             onChangeText={setDate}
           />
         </View>
+        {error && <Text style={styles.error}>{error}</Text>}
         <TouchableOpacity style={styles.button} onPress={handleAddTransaction}>
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
@@ -117,6 +139,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     textAlign: 'center',
+  },
+  error: {
+    color: 'red',
+    marginBottom: 10,
   },
 });
 
